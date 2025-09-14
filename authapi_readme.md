@@ -9,7 +9,7 @@ La base de datos se monta en **SQL Server** y la solución expone endpoints docu
 
 - **SQL Server** instalado y corriendo
 - **SQL Server Management Studio (SSMS)** o cualquier cliente para ejecutar scripts SQL
-- **.NET 6/7 SDK**
+- **.NET 8 SDK**
 - **Visual Studio** o **VS Code**
 - **Postman** (opcional, para pruebas de endpoints)
 
@@ -18,21 +18,13 @@ La base de datos se monta en **SQL Server** y la solución expone endpoints docu
 ## 📦 Configuración de la Base de Datos
 
 1. **Crear la base de datos y la tabla de Usuarios**  
-   Ejecutar en SQL Server el script [`AuthApiDb.sql`](./AuthApiDb.sql):
+   Ejecutar en SQL Server el script [`AuthApiDb.sql`](BasedeDatos/AuthApiDb.sql):
 
-   ```sql
-   -- Este script crea la base de datos AuthApi y la tabla Usuarios
-   ```
 
    > Asegúrate de estar en el servidor correcto antes de ejecutar el script.
 
 2. **Crear el trigger para fechas de control**  
-   Una vez creada la base, ejecútalo con `trg_set_fechas_usuarios.sql`:
-
-   ```sql
-   -- Este trigger llena FechaCreacion en un INSERT
-   -- y actualiza FechaModificacion en un UPDATE
-   ```
+   Una vez creada la base, ejecútalo el script [`trg_set_fechas_usuarios.sql`](BasedeDatos/trg_set_fechas_usuarios.sql):
 
    > Importante: el trigger debe ejecutarse después de haber creado la tabla `Usuarios`.
 
