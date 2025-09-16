@@ -6,10 +6,11 @@ using AuthApiTest.Custom;
 using AuthApiTest.Models;
 using AuthApiTest.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AuthApiTest.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/auth")]
     [AllowAnonymous]
     [ApiController]
     public class AccesoController : ControllerBase
@@ -23,38 +24,9 @@ namespace AuthApiTest.Controllers
             _utilidades = utilidades;
         }
 
-        [HttpPost]
-        [Route("CreateUser")]
-        public async Task<IActionResult>Register(UsuarioDTO objeto)
-        {
-            var modeloUsuario = new Usuario
-            {
-                Nombres = objeto.Nombres,
-                Apellidos = objeto.Apellidos,
-                Telefono = objeto.Telefono,
-                Password = _utilidades.encriptarSHA256(objeto.Password),
-                Email = objeto.Email,
-                FechaNacimiento = objeto.FechaNacimiento,
-                Direccion = objeto.Direccion,
-                Estado = "A"
-
-            };
-            await _context.Usuarios.AddAsync(modeloUsuario);
-            await _context.SaveChangesAsync();
-
-            if(modeloUsuario.Id != 0)
-            {
-                return StatusCode(StatusCodes.Status200OK, new { isSuccess = true });
-            }else
-            {
-                return StatusCode(StatusCodes.Status200OK, new { isSuccess = false });
-            }
-
-        }
-
 
         [HttpPost]
-        [Route("Login")]
+        [Route("login")]
 
         public async Task<IActionResult> Login(LoginDTO objeto)
         {
@@ -70,7 +42,7 @@ namespace AuthApiTest.Controllers
                 return StatusCode(StatusCodes.Status200OK, new { isSuccess = true, token = _utilidades.generarJWT(usuarioEncontrado) });
             }
         }
-
+        
         
     }
 }
