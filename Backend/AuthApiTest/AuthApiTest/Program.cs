@@ -1,9 +1,10 @@
+using AuthApiTest.Custom; 
+using AuthApiTest.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
-using AuthApiTest.Custom; 
-using AuthApiTest.Models;
 
 
 
@@ -22,6 +23,45 @@ builder.Services.AddDbContext<AuthApiContext>(options =>
 });
 
 builder.Services.AddSingleton<Utilidades>();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Mi API",
+        Version = "v1"
+    });
+
+    // Definir esquema Bearer con tipo Http
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,    // <--- CLAVE
+        Scheme = "Bearer",                 // <--- CLAVE
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Introduce tu JWT con el prefijo Bearer. Ejemplo: Bearer 12345abcdef"
+    });
+
+    // Asociar el esquema de seguridad a los endpoints
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+
+
 builder.Services.AddAuthentication(config =>
 {
     config.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -37,7 +77,7 @@ builder.Services.AddAuthentication(config =>
         ValidateAudience = false,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:key"]!))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["jwt:key"]!))
     }; 
 }
 );
@@ -50,6 +90,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -59,9 +102,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("NewPolicy");
-
 app.UseHttpsRedirection();
+
+app.UseCors("NewPolicy");
 
 app.UseAuthentication();
 
